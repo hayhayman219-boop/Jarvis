@@ -180,8 +180,9 @@ fn woke_as_hacks(text: &str) -> bool {
 }
 
 // --- Double-clap "summon the window" detection ---
-/// A clap is a short, LOUD transient — well above speech energy.
-const CLAP_ABS_THRESHOLD: f32 = 0.09;
+/// A clap is a short, LOUD transient. Calibrated above keyboard keystrokes
+/// (which peak ~0.18 on this mic) so typing can't false-trigger it.
+const CLAP_ABS_THRESHOLD: f32 = 0.25;
 /// 30ms analysis frames (@16kHz).
 const CLAP_FRAME: usize = 480;
 /// A natural double clap lands in this inter-clap gap.

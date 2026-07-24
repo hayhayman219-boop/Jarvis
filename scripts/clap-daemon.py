@@ -18,7 +18,11 @@ import time
 RATE = 16000
 FRAME = 480              # 30 ms @ 16 kHz
 FRAME_BYTES = FRAME * 2  # s16le
-CLAP_THRESH = float(os.environ.get("CLAP_THRESH", "0.08"))  # claps are loud
+# Claps must clear this normalized RMS. Calibrated above keyboard keystrokes
+# (which peaked ~0.18 on this mic) so typing can't trigger it; firm claps hit
+# 0.25–0.6. Lower it if your claps aren't registering.
+CLAP_THRESH = float(os.environ.get("CLAP_THRESH", "0.25"))
+DEBUG = os.environ.get("CLAP_DEBUG", "0") == "1"  # log every transient's level
 ATTACK = 3.0             # a clap is a sharp rise from the previous frame
 MIN_GAP = 0.09           # inter-clap spacing bounds (seconds)
 MAX_GAP = 0.70
@@ -80,6 +84,10 @@ def main():
 
         r = frame_rms(buf)
         now = time.monotonic()
+        # Calibration: log the level of any transient (a sharp rise above a low
+        # floor) so keystroke vs clap loudness can be compared. CLAP_DEBUG=1.
+        if DEBUG and r > 0.02 and r > prev * ATTACK:
+            print("[clap-daemon] transient rms=%.3f" % r, flush=True)
         # Register a clap onset: loud + a sharp rise, outside the refractory of
         # the previous one.
         if now >= refractory_until and r > CLAP_THRESH and r > prev * ATTACK:
