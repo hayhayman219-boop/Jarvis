@@ -58,12 +58,24 @@ pub fn run() {
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.unminimize();
+                let _ = window.show();
                 let _ = window.set_focus();
             }
         }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_notification::init())
+        // Hide-on-close instead of destroy: Jarvis is a persistent background
+        // service (always-on wake word + double-clap listener), so closing the
+        // window should tuck it away, not tear down the webview. Keeping the
+        // window alive is what lets a double-clap (or "Hey Jarvis") bring it
+        // back — otherwise there's nothing to re-show.
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = window.hide();
+            }
+        })
         .setup(|app| {
             // WebKitGTK (the Linux webview) denies getUserMedia by default, so
             // the in-app webcam/mic-capture screens fail with "not allowed".

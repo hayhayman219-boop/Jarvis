@@ -115,6 +115,19 @@ After rebooting, `ollama ps` should show your model running on the GPU. On a
 launches at login and installs an app-menu launcher. Review it first — it's
 tailored to a systemd user session.
 
+Closing the window **hides** Jarvis (he keeps running in the background so the
+wake word and double-clap still work). To also let a **double-clap launch him
+when he's fully closed**, install the tiny clap-listener daemon:
+
+```bash
+cp scripts/jarvis-clap-daemon.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now jarvis-clap-daemon.service
+```
+
+It listens for a double clap (via `parecord`) and starts the app — a harmless
+no-op if Jarvis is already running.
+
 ---
 
 ## Connecting integrations
