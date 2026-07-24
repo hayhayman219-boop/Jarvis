@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { listNotionPages, readNotionPage, type NotionPage } from "../../lib/apiClient";
+import { MarkdownText } from "../chat/MarkdownText";
 
 // A pop-up screen listing the Notion pages shared with Jarvis's integration;
 // clicking a page loads and shows its text. Styled to match the HUD panels.
@@ -113,8 +114,14 @@ export function NotionViewer({ onClose }: { onClose: () => void }) {
             ✕
           </button>
         </div>
-        <div style={{ padding: 20, overflowY: "auto", flex: 1, whiteSpace: "pre-wrap", lineHeight: 1.55, fontSize: 14 }}>
-          {contentLoading ? "Loading…" : active ? content : "Choose a page from the left to read it."}
+        <div style={{ padding: 20, overflowY: "auto", flex: 1, lineHeight: 1.55, fontSize: 14 }}>
+          {contentLoading ? (
+            "Loading…"
+          ) : active ? (
+            <MarkdownText text={content} />
+          ) : (
+            "Choose a page from the left to read it."
+          )}
         </div>
       </div>
     </div>

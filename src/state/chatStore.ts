@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import type { ChatMessage, NewsCategory, ReactorStatus } from "../lib/types";
-import { addToCart, chatStreamWeb, closeApp, exportPdf, getNews, getWeather, homeCommand, listFiles, lockScreen, openApp, openNews, openUrls, openWeb, readScreen, runCommand, setBrightness, setVolume, speak, stopSpeaking, takeScreenshot } from "../lib/apiClient";
+import { addToCart, chatStreamWeb, closeApp, exportPdf, getNews, getWeather, homeCommand, listFiles, listSubscriptions, lockScreen, openApp, openNews, openUrls, openWeb, readScreen, runCommand, setBrightness, setVolume, speak, stopSpeaking, takeScreenshot } from "../lib/apiClient";
 import { buildBriefing } from "../lib/briefing";
 import { findScene, sceneUrl } from "../data/ironManScenes";
 import { useTimersStore } from "./timersStore";
@@ -553,6 +553,30 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
     }
 
+    // Subscriptions — pull the user's Notion "Monthly Budget" so Jarvis can
+    // answer "what are my subscriptions / how much do I spend" naturally.
+    let subsNote = "";
+    if (
+      /\bsubscriptions?\b/i.test(content) ||
+      /\bmonthly budget\b/i.test(content) ||
+      /what am i (?:paying|subscribed)/i.test(content)
+    ) {
+      try {
+        const subs = await listSubscriptions();
+        if (subs.length) {
+          const lines = subs
+            .map((s) => `- ${s.name}: ${s.amount != null ? "$" + s.amount.toFixed(2) : "n/a"}`)
+            .join("\n");
+          const total = subs.reduce((a, s) => a + (s.amount ?? 0), 0);
+          subsNote = `\n\nUSER'S SUBSCRIPTIONS (from their Notion "Monthly Budget"):\n${lines}\nTotal: $${total.toFixed(2)}/month. Use this to answer; don't invent items.`;
+        } else {
+          subsNote = `\n\n(No subscriptions found in the user's Notion budget.)`;
+        }
+      } catch (e) {
+        subsNote = `\n\n(Couldn't read subscriptions from Notion: ${e}.)`;
+      }
+    }
+
     const userMessage: StoredMessage = { role: "user", content, aiId };
     // Only THIS AI's own conversation is its context/history.
     const ownHistory = [...get().messages.filter((m) => m.aiId === aiId), userMessage];
@@ -561,6 +585,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const liveContext = await buildLiveContext(content);
     if (screenNote) liveContext.content += screenNote;
     if (ocrNote) liveContext.content += ocrNote;
+    if (subsNote) liveContext.content += subsNote;
     // Cap the history sent to the model (full history stays in the UI and
     // on disk). Persisted chats grow without bound, and an over-long prompt
     // gets truncated from the top — which was silently discarding the

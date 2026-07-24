@@ -195,6 +195,7 @@ pub fn run() {
             home::list_home_entities,
             notion::list_notion_pages,
             notion::read_notion_page,
+            notion::list_notion_subscriptions,
             apple::list_apple_events,
             apple::list_apple_reminders,
             google::list_google_events,

@@ -177,6 +177,17 @@ export function readScreen(): Promise<string> {
   return Promise.reject(new Error("Screen OCR is only available in the desktop app."));
 }
 
+export interface Subscription {
+  name: string;
+  amount: number | null;
+}
+
+/** Reads the user's subscriptions from their Notion budget database. */
+export function listSubscriptions(): Promise<Subscription[]> {
+  if (isTauri) return invoke<Subscription[]>("list_notion_subscriptions");
+  return apiFetch("/notion-subscriptions");
+}
+
 export interface ComicResult {
   name: string;
   issue_number: string;
