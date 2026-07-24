@@ -1,0 +1,151 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap");
+
+:root {
+  --jarvis-bg: #04080b;
+  --jarvis-bg-panel: #0a1220;
+  --jarvis-cyan: #2fd4ff;
+  --jarvis-cyan-dim: #1a5b7a;
+  --jarvis-cyan-glow: rgba(47, 212, 255, 0.55);
+  --jarvis-gold: #e8b04b;
+  --jarvis-red: #ff4d4d;
+  --jarvis-text: #bdf3ff;
+  --jarvis-text-bright: #eafcff;
+  --jarvis-text-dim: #5c8a96;
+  --jarvis-border-radius: 4px;
+  --jarvis-font-display: "Orbitron", sans-serif;
+  --jarvis-font-body: "Rajdhani", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--jarvis-bg);
+  color: var(--jarvis-text);
+  font-family: var(--jarvis-font-body);
+}
+
+body {
+  background-image: radial-gradient(
+    ellipse 1200px 900px at 50% 40%,
+    #071319 0%,
+    #04090c 55%,
+    #020506 100%
+  );
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rotate-rev {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.jarvis-panel {
+  background: var(--jarvis-bg-panel);
+  border: 1px solid var(--jarvis-cyan-dim);
+  border-radius: var(--jarvis-border-radius);
+  position: relative;
+}
+
+.jarvis-panel::before,
+.jarvis-panel::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--jarvis-cyan);
+}
+
+.jarvis-panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.jarvis-panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+.jarvis-scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.05;
+  z-index: 999;
+}
+
+.jarvis-scanlines::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(180deg, transparent, var(--jarvis-cyan-glow), transparent);
+  animation: scanline 7s linear infinite;
+}
+
+.jarvis-grid {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(47, 212, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 212, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.jarvis-label {
+  font-family: var(--jarvis-font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: var(--jarvis-text-dim);
+}

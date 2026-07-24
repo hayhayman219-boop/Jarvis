@@ -1,0 +1,14 @@
+[Unit]
+Description=Clear wedged PipeWire audio graph at login (Jarvis)
+# Run after the session and audio stack have come up; the wedge this fixes
+# has been observed present right after boot.
+After=graphical-session.target pipewire.service wireplumber.service
+
+[Service]
+Type=oneshot
+# Let the desktop/audio finish settling before kicking the stack.
+ExecStartPre=/bin/sleep 10
+ExecStart=%h/Jarvis/scripts/fix-audio.sh
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Jarvis desktop assistant
+After=graphical-session.target jarvis-fix-audio.service
+
+[Service]
+ExecStart=%h/Jarvis/src-tauri/target/release/jarvis
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

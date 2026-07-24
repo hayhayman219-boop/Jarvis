@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Jarvis rootkit scan shortly after boot
+
+[Timer]
+OnBootSec=3min
+Persistent=false
+
+[Install]
+WantedBy=timers.target

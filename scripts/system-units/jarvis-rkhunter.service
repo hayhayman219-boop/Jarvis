@@ -1,0 +1,9 @@
+[Unit]
+Description=Jarvis rootkit scan (rkhunter)
+
+[Service]
+Type=oneshot
+# --sk: skip keypress prompts; --rwo: report warnings only.
+ExecStart=/bin/sh -c 'rkhunter --check --sk --rwo --nocolors > /var/lib/jarvis-security/rkhunter-last.txt 2>&1; echo "scanned: $(date -Is)" >> /var/lib/jarvis-security/rkhunter-last.txt; chmod 644 /var/lib/jarvis-security/rkhunter-last.txt; true'
+Nice=19
+IOSchedulingClass=idle

@@ -1,0 +1,73 @@
+[package]
+name = "jarvis"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+# Disambiguates `cargo run` (used internally by `tauri dev`) now that this
+# crate has two binaries: the Tauri desktop app (`jarvis`, from main.rs) and
+# the standalone web server (`server`, from src/bin/server/).
+default-run = "jarvis"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "jarvis_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Tauri + voice deps are optional and gated behind the `desktop` feature, so a
+# headless "server-only" build (for the phone node) drops Tauri, WebKitGTK,
+# whisper (C++) and the ALSA/audio stack — leaving a lean, easily
+# cross-compiled binary. On by default → the desktop app is unchanged.
+tauri = { version = "2", features = [], optional = true }
+tauri-plugin-opener = { version = "2", optional = true }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.13.4", features = ["json"] }
+tokio = { version = "1.52.3", features = ["full"] }
+chrono = { version = "0.4.45", features = ["serde"] }
+tauri-plugin-store = { version = "2.4.3", optional = true }
+tauri-plugin-notification = { version = "2.3.3", optional = true }
+rusqlite = { version = "0.40.1", features = ["bundled"] }
+cpal = { version = "0.18.1", optional = true }
+whisper-rs = { version = "0.16.0", optional = true }
+sysinfo = "0.39.5"
+axum = { version = "0.8.9", features = ["multipart"] }
+tower-http = { version = "0.7.0", features = ["cors", "fs"] }
+axum-server = { version = "0.8.0", features = ["tls-rustls"] }
+rcgen = "0.14.8"
+local-ip-address = "0.6.13"
+tokio-stream = "0.1.18"
+feed-rs = "2.4.0"
+tauri-plugin-single-instance = { version = "2.4.3", optional = true }
+quick-xml = "0.37.2"
+
+[features]
+# Default = the full desktop app. The headless phone-node server is built with
+# `--no-default-features`, which omits Tauri, WebKitGTK, whisper and audio — so
+# it cross-compiles to aarch64/musl with no GUI/native-media system libraries.
+default = ["desktop"]
+desktop = [
+    "dep:tauri",
+    "dep:tauri-plugin-opener",
+    "dep:tauri-plugin-store",
+    "dep:tauri-plugin-notification",
+    "dep:tauri-plugin-single-instance",
+    "dep:webkit2gtk",
+    "dep:whisper-rs",
+    "dep:cpal",
+]
+
+# Linux webview: needed to grant camera/mic getUserMedia permission requests,
+# which WebKitGTK denies by default. Pinned to the version wry/Tauri already
+# pulls in so there's no duplicate native binding.
+[target.'cfg(target_os = "linux")'.dependencies]
+webkit2gtk = { version = "=2.0.2", optional = true }
+

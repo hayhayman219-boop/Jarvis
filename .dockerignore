@@ -1,0 +1,8 @@
+# Keep the build context small + avoid shipping x86 build artifacts into the
+# arm64 image.
+target/
+src-tauri/target/
+node_modules/
+dist-phone/
+.git/
+*.log

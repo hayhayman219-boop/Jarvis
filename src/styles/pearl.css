@@ -1,0 +1,56 @@
+/* Pearl-white text across the whole app.
+ *
+ * The panels (settings, chat, widgets) were built against theme.css's
+ * --jarvis-* variables; those are imported now so the panels render cleanly
+ * and legibly. Here we (1) repoint the text variables to a soft pearl white
+ * and (2) force every text node pearl with a high-specificity rule so even
+ * inline-styled cyan text obeys. Borders, glows, and the orb's SVG use
+ * `border`/`box-shadow`/`stroke`/`fill` (not `color`), so they keep their
+ * electric-blue accent untouched. */
+
+:root {
+  --pearl: #f4f1ea;
+  --jarvis-text: #f4f1ea;
+  --jarvis-text-bright: #fbfaf5;
+  --jarvis-text-dim: #d9d5cc;
+}
+
+#root,
+#root * {
+  color: var(--pearl) !important;
+}
+
+/* Keep the single dark-navy theme.css background across the whole app
+ * (main screen and settings panel alike) — no electric-blue override — so
+ * everything is one consistent theme with pearl-white text. */
+
+/* Inputs/placeholders in the settings panel: pearl text on a legible dark
+ * field so the form is clearly readable. */
+#root input,
+#root select,
+#root textarea {
+  background: rgba(4, 8, 14, 0.85) !important;
+  border: 1px solid rgba(180, 210, 255, 0.5) !important;
+}
+#root input::placeholder,
+#root textarea::placeholder {
+  color: #b9b4a8 !important;
+}
+
+/* Native <select> (the model picker) is drawn white by the GTK theme in
+ * WebKitGTK, ignoring background CSS. Disabling native appearance makes it
+ * obey our dark theme; a custom caret replaces the one that removes. The
+ * dropdown option list is themed too so it isn't white when opened. */
+#root select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 6px 28px 6px 8px !important;
+  border-radius: 4px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%23bfe9ff' stroke-width='1.6' fill='none'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+}
+#root select option {
+  background: #0a1220 !important;
+  color: var(--pearl) !important;
+}

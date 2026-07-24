@@ -1,0 +1,8 @@
+[Unit]
+Description=Jarvis file-integrity check (AIDE)
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'aide --check --config /etc/aide/aide.conf > /var/lib/jarvis-security/aide-last.txt 2>&1; echo "scanned: $(date -Is)" >> /var/lib/jarvis-security/aide-last.txt; chmod 644 /var/lib/jarvis-security/aide-last.txt; true'
+Nice=19
+IOSchedulingClass=idle

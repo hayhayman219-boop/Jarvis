@@ -1,0 +1,13 @@
+[Unit]
+Description=Jarvis boot-time security sweep
+After=graphical-session.target network-online.target
+
+[Service]
+Type=oneshot
+# Let the session, network, and audio settle first (the audio fix runs ~10s
+# after login; this speaks its alert through the speakers when needed).
+ExecStartPre=/bin/sleep 25
+ExecStart=%h/Jarvis/scripts/security-check.sh
+
+[Install]
+WantedBy=graphical-session.target
